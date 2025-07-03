@@ -1,4 +1,8 @@
 <?php
+// Disable error display to prevent HTML output in JSON responses
+ini_set('display_errors', 0);
+error_reporting(E_ALL);
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: http://localhost:3000');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -25,7 +29,7 @@ try {
     $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
     // Log requests in development mode only
-    if ($_ENV['APP_ENV'] !== 'production') {
+    if (isset($_ENV['APP_ENV']) && $_ENV['APP_ENV'] !== 'production') {
         error_log("API Request - Method: $method, Path: $path");
     }
 
