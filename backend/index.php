@@ -24,8 +24,10 @@ try {
     // Get JSON input for POST/PUT requests
     $input = json_decode(file_get_contents('php://input'), true) ?? [];
 
-    // Debug info (remove this later)
-    error_log("Method: $method, Path: $path");
+    // Log requests in development mode only
+    if ($_ENV['APP_ENV'] !== 'production') {
+        error_log("API Request - Method: $method, Path: $path");
+    }
 
     // Handle routing
     if ($path === '' || $path === '/index.php' || $path === '/tasks') {

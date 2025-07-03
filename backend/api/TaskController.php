@@ -1,6 +1,18 @@
 <?php
 require_once __DIR__ . '/../config/database.php';
 
+/**
+ * TaskController - Handles all task-related API operations
+ * 
+ * Provides RESTful endpoints for:
+ * - GET /tasks - Retrieve all tasks
+ * - POST /tasks - Create new task
+ * - PUT /tasks/{id} - Update task (toggle completion)
+ * - DELETE /tasks/{id} - Delete task
+ * 
+ * All responses follow the format:
+ * { "success": boolean, "data"?: any, "error"?: string }
+ */
 class TaskController {
     private $db;
 

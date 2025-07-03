@@ -1,36 +1,142 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Todo List Manager
 
-## Getting Started
+A modern, full-stack todo application built with Next.js, TypeScript, PHP, and SQLite.
 
-First, run the development server:
+## 🚀 Features
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- ✅ Create, read, update, and delete tasks
+- 🎯 Priority-based task management (High, Medium, Low)
+- 📊 Real-time task statistics
+- 🔄 Optimistic UI updates
+- 📱 Responsive design
+- ⚡ Fast SQLite database
+- 🔒 Input validation and error handling
+
+## 🏗️ Architecture
+
+```
+Frontend (Next.js + TypeScript)
+├── React Components (UI)
+├── Custom Hooks (State Management)
+└── API Integration (REST)
+        ↓
+Backend (PHP + SQLite)
+├── REST API Endpoints
+├── Database Layer (PDO)
+└── Data Validation
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📁 Project Structure
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```
+todo-app/
+├── src/                    # Frontend source code
+│   ├── app/               # Next.js app directory
+│   ├── components/        # React components
+│   │   ├── task/         # Task-specific components
+│   │   └── ui/           # Reusable UI components
+│   ├── hooks/            # Custom React hooks
+│   ├── lib/              # Utilities and constants
+│   └── types/            # TypeScript type definitions
+└── backend/               # PHP backend
+    ├── api/              # API controllers
+    ├── config/           # Database configuration
+    └── database/         # SQLite database and schema
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Setup Instructions
 
-## Learn More
+### Prerequisites
+- Node.js 18+ 
+- PHP 8.0+
+- SQLite3
 
-To learn more about Next.js, take a look at the following resources:
+### Frontend Setup
+```bash
+# Install dependencies
+npm install
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# Start development server
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Backend Setup
+```bash
+# Navigate to backend directory
+cd backend
 
-## Deploy on Vercel
+# Start PHP development server
+php -S localhost:8000
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Database will be automatically initialized
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### Access the Application
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+
+## 🔌 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/tasks` | Get all tasks |
+| POST | `/tasks` | Create new task |
+| PUT | `/tasks/{id}` | Update task (toggle completion) |
+| DELETE | `/tasks/{id}` | Delete task |
+
+## 🗃️ Database Schema
+
+```sql
+CREATE TABLE tasks (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    description TEXT,
+    priority TEXT CHECK (priority IN ('HIGH', 'MEDIUM', 'LOW')),
+    completed BOOLEAN DEFAULT FALSE,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    completed_at DATETIME NULL
+);
+```
+
+## 🧪 Development
+
+### Key Components
+- **useTasks Hook**: Central state management for task operations
+- **TaskForm**: Form for creating new tasks
+- **TaskList**: Displays and filters tasks
+- **TaskItem**: Individual task component with actions
+
+### Code Quality Features
+- TypeScript for type safety
+- React memo for performance optimization
+- Proper error handling and loading states
+- Responsive design with Tailwind CSS
+- Clean separation of concerns
+
+## 🚀 Deployment
+
+### Frontend (Vercel)
+```bash
+npm run build
+```
+
+### Backend (Any PHP hosting)
+- Upload backend files
+- Ensure SQLite write permissions
+- Configure web server to handle API routes
+
+## 🧩 Built With
+
+- **Frontend**: Next.js 15, React 19, TypeScript, Tailwind CSS
+- **Backend**: PHP 8, SQLite, PDO
+- **UI Components**: Radix UI, Lucide React
+- **Styling**: Tailwind CSS with custom components
+
+## 📈 Future Enhancements
+
+- [ ] User authentication
+- [ ] Task categories/tags
+- [ ] Due dates and reminders
+- [ ] Task sharing and collaboration
+- [ ] Mobile app (React Native)
+- [ ] Real-time updates with WebSockets

@@ -5,37 +5,75 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Plus, RefreshCw } from 'lucide-react';
 import { TaskPriority } from '@/types/task';
 import { TASK_PRIORITIES, PRIORITY_LABELS } from '@/lib/constants';
 
 interface TaskFormProps {
-  onAddTask: (title: string, description: string, priority: TaskPriority) => void;
+  /** Callback function to handle task creation */
+  onAddTask: (title: string, description: string, priority: TaskPriority) => Promise<void>;
+  /** Loading state to disable form during submission */
+  loading?: boolean;
 }
 
-const TaskForm = React.memo<TaskFormProps>(({ onAddTask }) => {
+/**
+ * Form component for creating new tasks
+ * 
+ * Features:
+ * - Input validation (title required)
+ * - Priority selection
+ * - Loading states and disabled inputs
+ * - Form reset after successful submission
+ * - Accessible form controls
+ */
+const TaskForm = React.memo<TaskFormProps>(({ onAddTask, loading = false }) => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<TaskPriority>(TASK_PRIORITIES.MEDIUM);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const isFormValid = useCallback((): boolean => {
     return title.trim().length > 0;
   }, [title]);
 
   const canSubmitForm = useCallback((): boolean => {
-    return isFormValid();
-  }, [isFormValid]);
+    return isFormValid() && !isSubmitting && !loading;
+  }, [isFormValid, isSubmitting, loading]);
 
-  const handleSubmit = useCallback((e: React.FormEvent) => {
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!canSubmitForm()) return;
 
-    onAddTask(title.trim(), description.trim(), priority);
+    setIsSubmitting(true);
 
-    setTitle('');
-    setDescription('');
-    setPriority(TASK_PRIORITIES.MEDIUM);
+    try {
+      await onAddTask(title.trim(), description.trim(), priority);
+
+      // Reset form on success
+      setTitle('');
+      setDescription('');
+      setPriority(TASK_PRIORITIES.MEDIUM);
+    } catch (error) {
+      // Error handling is done in the parent component
+      console.error('Failed to add task:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
   }, [title, description, priority, canSubmitForm, onAddTask]);
+
+  const getButtonText = useCallback((): string => {
+    if (isSubmitting) return 'Adding Task...';
+    if (loading) return 'Loading...';
+    return 'Add Task';
+  }, [isSubmitting, loading]);
+
+  const getButtonIcon = useCallback(() => {
+    if (isSubmitting || loading) {
+      return <RefreshCw className="h-4 w-4 animate-spin" />;
+    }
+    return <Plus className="h-4 w-4" />;
+  }, [isSubmitting, loading]);
 
   return (
     <Card>
@@ -49,6 +87,7 @@ const TaskForm = React.memo<TaskFormProps>(({ onAddTask }) => {
               placeholder="Task title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
+              disabled={isSubmitting || loading}
               required
             />
           </div>
@@ -58,11 +97,16 @@ const TaskForm = React.memo<TaskFormProps>(({ onAddTask }) => {
               placeholder="Description (optional)"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
+              disabled={isSubmitting || loading}
             />
           </div>
 
           <div>
-            <Select value={priority} onValueChange={(value: TaskPriority) => setPriority(value)}>
+            <Select
+              value={priority}
+              onValueChange={(value: TaskPriority) => setPriority(value)}
+              disabled={isSubmitting || loading}
+            >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -85,7 +129,8 @@ const TaskForm = React.memo<TaskFormProps>(({ onAddTask }) => {
             disabled={!canSubmitForm()}
             className="w-full"
           >
-            Add Task
+            {getButtonIcon()}
+            <span className="ml-2">{getButtonText()}</span>
           </Button>
         </form>
       </CardContent>
